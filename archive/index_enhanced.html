@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Vídeos IA - Linguagem Natural para Vídeos Educativos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f0f0f;
+            color: #e5e5e5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(to right, #1a1a2e, #16213e);
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .input-panel {
+            flex: 1;
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .prompt-area {
+            width: 100%;
+            min-height: 150px;
+            background: #0f0f1f;
+            border: 2px solid #2d3561;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #e5e5e5;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .prompt-area:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #2d3561;
+            color: #e5e5e5;
+        }
+
+        .btn-secondary:hover {
+            background: #3d4671;
+        }
+
+        .preview-panel {
+            flex: 1;
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .video-preview {
+            background: #0f0f1f;
+            border-radius: 8px;
+            aspect-ratio: 9/16;
+            max-width: 360px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-content {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .preview-image, .preview-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .preview-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .timeline {
+            margin-top: 2rem;
+            background: #0f0f1f;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-track {
+            background: #2d3561;
+            height: 60px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-segment {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            font-size: 0.875rem;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .timeline-segment:hover {
+            opacity: 0.8;
+        }
+
+        .settings-panel {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #0f0f1f;
+            border-radius: 8px;
+        }
+
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #a5a5a5;
+            font-size: 0.875rem;
+        }
+
+        .setting-group select,
+        .setting-group input[type="range"] {
+            width: 100%;
+            background: #2d3561;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem;
+            color: #e5e5e5;
+        }
+
+        .range-value {
+            text-align: right;
+            color: #667eea;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .status-message {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: #2d3561;
+            color: white;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .status-message.success {
+            background: #10b981;
+        }
+
+        .status-message.error {
+            background: #ef4444;
+        }
+
+        .status-message.warning {
+            background: #f59e0b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2d3561;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading .spinner {
+            display: block;
+        }
+
+        .script-display {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #0f0f1f;
+            border-radius: 8px;
+            border: 1px solid #2d3561;
+        }
+
+        .script-display h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .script-text {
+            color: #e5e5e5;
+            line-height: 1.6;
+        }
+
+        .word-count {
+            color: #a5a5a5;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .video-player {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .subtitles-overlay {
+            position: absolute;
+            bottom: 10%;
+            left: 10%;
+            right: 10%;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            display: none;
+        }
+
+        .subtitles-overlay.active {
+            display: block;
+        }
+
+        .audio-player {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+        }
+
+        .play-button-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .play-button-overlay:hover {
+            opacity: 0.8;
+        }
+
+        .play-button-overlay.playing {
+            display: none;
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 30px solid white;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Criador de Vídeos IA</h1>
+    </header>
+
+    <main class="main-container">
+        <!-- Painel de Entrada -->
+        <div class="input-panel">
+            <h2 style="margin-bottom: 1.5rem; color: #e5e5e5;">Crie Seu Vídeo</h2>
+            
+            <div>
+                <label for="prompt" style="display: block; margin-bottom: 0.5rem; color: #a5a5a5;">
+                    Descreva seu vídeo educativo (ex: "Crie um vídeo sobre os benefícios da meditação")
+                </label>
+                <textarea 
+                    id="prompt" 
+                    class="prompt-area" 
+                    placeholder="Exemplo: Crie um vídeo de 30 segundos explicando como funciona a fotossíntese para alunos do ensino fundamental. Use linguagem simples e imagens coloridas de plantas e luz solar."
+                ></textarea>
+            </div>
+
+            <div class="controls">
+                <button id="generateBtn" class="btn btn-primary">
+                    Gerar Vídeo
+                </button>
+                <button id="clearBtn" class="btn btn-secondary">
+                    Limpar
+                </button>
+                <div id="spinner" class="spinner"></div>
+            </div>
+
+            <div class="settings-panel">
+                <h3 style="margin-bottom: 1rem; color: #e5e5e5;">Configurações</h3>
+                
+                <div class="setting-group">
+                    <label for="voice">Seleção de Voz (Google Studio)</label>
+                    <select id="voice">
+                        <option value="pt-BR-Wavenet-A">Studio Feminina - Natural e Sofisticada</option>
+                        <option value="pt-BR-Wavenet-B">Studio Masculina - Profissional</option>
+                        <option value="pt-BR-Wavenet-C">Studio Feminina - Jovem e Dinâmica</option>
+                        <option value="pt-BR-Neural2-A">Neural Feminina - Clara</option>
+                        <option value="pt-BR-Neural2-B">Neural Masculina - Formal</option>
+                        <option value="pt-BR-Neural2-C">Neural Feminina - Amigável</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label for="speechRate">Velocidade da Fala</label>
+                    <input type="range" id="speechRate" min="0.75" max="1.25" step="0.05" value="1.0">
+                    <div class="range-value" id="speechRateValue">1.0x</div>
+                </div>
+
+                <div class="setting-group">
+                    <label for="imageStyle">Estilo de Imagem</label>
+                    <select id="imageStyle">
+                        <option value="educational">Educacional</option>
+                        <option value="animated">Animado</option>
+                        <option value="realistic">Realista</option>
+                        <option value="minimalist">Minimalista</option>
+                        <option value="colorful">Colorido</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="scriptDisplay" class="script-display" style="display: none;">
+                <h3>Roteiro Gerado</h3>
+                <div class="script-text" id="scriptText"></div>
+                <div class="word-count" id="wordCount"></div>
+            </div>
+        </div>
+
+        <!-- Painel de Visualização -->
+        <div class="preview-panel">
+            <h2 style="margin-bottom: 1.5rem; color: #e5e5e5;">Visualização</h2>
+            
+            <div class="video-preview" id="videoPreview">
+                <div class="preview-content">
+                    <p style="color: #a5a5a5;">A visualização do seu vídeo aparecerá aqui</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-header">
+                    <h3 style="color: #e5e5e5;">Linha do Tempo</h3>
+                    <span id="duration" style="color: #a5a5a5;">0:00 / 0:30</span>
+                </div>
+                <div class="timeline-track" id="timelineTrack">
+                    <!-- Segmentos da linha do tempo serão adicionados aqui -->
+                </div>
+            </div>
+
+            <div class="controls" style="margin-top: 2rem; justify-content: center;">
+                <button id="playBtn" class="btn btn-secondary" disabled>
+                    ▶️ Reproduzir Prévia
+                </button>
+                <button id="exportBtn" class="btn btn-primary" disabled>
+                    📹 Baixar Vídeo MP4
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <script>
+        // Variáveis globais
+        let currentProject = null;
+        let isGenerating = false;
+
+        // Função para mostrar status
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            statusEl.style.display = 'block';
+
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // Função para mostrar/esconder spinner
+        function showLoading(show) {
+            const generateBtn = document.getElementById('generateBtn');
+            const spinner = document.getElementById('spinner');
+            
+            generateBtn.style.display = show ? 'none' : 'block';
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        // Função para limpar tudo
+        function clearAll() {
+            document.getElementById('prompt').value = '';
+            document.getElementById('scriptDisplay').style.display = 'none';
+            document.getElementById('videoPreview').innerHTML = '<div class="preview-content"><p style="color: #a5a5a5;">A visualização do seu vídeo aparecerá aqui</p></div>';
+            document.getElementById('timelineTrack').innerHTML = '';
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('exportBtn').disabled = true;
+            currentProject = null;
+        }
+
+        // Função para extrair tópico
+        function extractTopic(prompt) {
+            const keywords = ['sobre', 'explicando', 'a respeito', 'acerca'];
+            for (const keyword of keywords) {
+                const index = prompt.toLowerCase().indexOf(keyword);
+                if (index !== -1) {
+                    return prompt.substring(index + keyword.length).trim().split(' ').slice(0, 3).join(' ');
+                }
+            }
+            return 'este tópico';
+        }
+
+        // Função para extrair palavras-chave
+        function extractKeywords(text) {
+            const commonWords = ['o', 'a', 'os', 'as', 'um', 'uma', 'e', 'ou', 'mas', 'em', 'de', 'para', 'com', 'por'];
+            return text.toLowerCase()
+                .split(/\W+/)
+                .filter(word => word.length > 3 && !commonWords.includes(word))
+                .slice(0, 3);
+        }
+
+        // Função para gerar imagem placeholder
+        function generatePlaceholderImage(keywords, index) {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
+            const color = colors[index % colors.length];
+            
+            const svg = `
+                <svg width="360" height="640" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="360" height="640" fill="${color}"/>
+                    <text x="50%" y="50%" text-anchor="middle" fill="white" font-size="24" font-family="Arial">
+                        ${keywords[0] || 'Cena ' + (index + 1)}
+                    </text>
+                </svg>
+            `;
+            
+            return btoa(svg);
+        }
+
+        // Variáveis para controle de reprodução
+        let isPlaying = false;
+        let currentSceneIndex = 0;
+        let playbackTimer = null;
+        let audioElement = null;
+        let subtitleTimer = null;
+
+        // Função para mostrar cena
+        function showScene(index) {
+            if (!currentProject) return;
+
+            const scene = currentProject.scenes[index];
+            const image = currentProject.images[index];
+            currentSceneIndex = index;
+
+            let mediaElement = '';
+            if (image.tipo === 'video' || image.tipo === 'gif') {
+                mediaElement = `<video src="${image.url}" class="preview-video" loop autoplay muted></video>`;
+            } else {
+                mediaElement = `<img src="${image.url}" alt="${image.alt}" class="preview-image">`;
+            }
+
+            document.getElementById('videoPreview').innerHTML = `
+                ${mediaElement}
+                <div class="preview-text">${scene.text}</div>
+                <div class="subtitles-overlay" id="subtitlesOverlay"></div>
+                <audio id="audioPlayer" class="audio-player" controls style="display: none;"></audio>
+                <div class="play-button-overlay ${isPlaying ? 'playing' : ''}" id="playButtonOverlay">
+                    <div class="play-icon"></div>
+                </div>
+                <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); 
+                            color: white; padding: 5px 10px; border-radius: 5px; font-size: 14px;">
+                    Cena ${index + 1}/${currentProject.scenes.length}
+                </div>
+            `;
+
+            // Configurar botão de play
+            const playButton = document.getElementById('playButtonOverlay');
+            if (playButton) {
+                playButton.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    togglePlayback();
+                };
+            }
+
+            // Destacar segmento na timeline
+            const segments = document.querySelectorAll('.timeline-segment');
+            segments.forEach((seg, i) => {
+                seg.style.opacity = i === index ? '1' : '0.6';
+            });
+        }
+
+        // Função para reproduzir vídeo
+        function playVideo() {
+            if (!currentProject || !currentProject.audio) {
+                showStatus('Projeto não carregado', 'warning');
+                return;
+            }
+
+            isPlaying = true;
+            currentSceneIndex = 0;
+
+            // Configurar e tocar áudio (se disponível)
+            audioElement = document.getElementById('audioPlayer');
+            if (audioElement && currentProject.audio.url && 
+                currentProject.audio.url !== 'placeholder' && 
+                currentProject.audio.url !== 'demo') {
+                try {
+                    console.log('Configurando áudio...');
+                    console.log('URL do áudio:', currentProject.audio.url.substring(0, 50) + '...');
+                    console.log('Duração esperada:', currentProject.audio.duration);
+                    
+                    // Tornar o player visível para debug
+                    audioElement.style.display = 'block';
+                    audioElement.style.position = 'absolute';
+                    audioElement.style.bottom = '10px';
+                    audioElement.style.left = '10px';
+                    audioElement.style.width = '90%';
+                    audioElement.style.zIndex = '1000';
+                    
+                    audioElement.src = currentProject.audio.url;
+                    audioElement.volume = 1.0;
+                    
+                    // Aguardar o áudio carregar antes de tocar
+                    audioElement.onloadedmetadata = () => {
+                        console.log('Metadados do áudio carregados');
+                        console.log('Duração real do áudio:', audioElement.duration);
+                    };
+                    
+                    audioElement.oncanplay = () => {
+                        console.log('Áudio pronto para reproduzir');
+                        audioElement.play().then(() => {
+                            console.log('Áudio iniciado com sucesso');
+                        }).catch(err => {
+                            console.error('Erro ao iniciar áudio:', err);
+                            if (err.name === 'NotAllowedError') {
+                                showStatus('Clique primeiro no vídeo para habilitar o áudio', 'warning');
+                            } else {
+                                showStatus('Erro ao reproduzir áudio: ' + err.message, 'warning');
+                            }
+                        });
+                    };
+                    
+                    audioElement.onplaying = () => {
+                        console.log('Áudio está reproduzindo');
+                    };
+                    
+                    audioElement.onerror = (e) => {
+                        console.error('Erro ao carregar áudio:', e);
+                        console.error('Código do erro:', audioElement.error?.code);
+                        console.error('Mensagem do erro:', audioElement.error?.message);
+                        showStatus('Erro ao carregar áudio', 'error');
+                    };
+                } catch (err) {
+                    console.error('Erro ao configurar áudio:', err);
+                }
+            } else {
+                console.log('Áudio não disponível ou é placeholder');
+            }
+
+            // Esconder botão de play
+            const playButton = document.getElementById('playButtonOverlay');
+            if (playButton) {
+                playButton.classList.add('playing');
+            }
+
+            // Atualizar botão de controle
+            const playBtn = document.getElementById('playBtn');
+            playBtn.textContent = '⏸️ Pausar';
+
+            // Iniciar reprodução das cenas
+            startScenePlayback();
+
+            // Iniciar legendas se disponíveis
+            if (currentProject.subtitles) {
+                startSubtitles();
+            }
+        }
+
+        // Função para pausar vídeo
+        function pauseVideo() {
+            isPlaying = false;
+
+            if (audioElement) {
+                audioElement.pause();
+            }
+
+            if (playbackTimer) {
+                clearTimeout(playbackTimer);
+            }
+
+            if (subtitleTimer) {
+                clearInterval(subtitleTimer);
+            }
+
+            // Mostrar botão de play
+            const playButton = document.getElementById('playButtonOverlay');
+            if (playButton) {
+                playButton.classList.remove('playing');
+            }
+
+            // Atualizar botão de controle
+            const playBtn = document.getElementById('playBtn');
+            playBtn.textContent = '▶️ Reproduzir Prévia';
+        }
+
+        // Função para alternar reprodução
+        function togglePlayback() {
+            if (isPlaying) {
+                pauseVideo();
+            } else {
+                playVideo();
+            }
+        }
+
+        // Função para reproduzir cenas em sequência
+        function startScenePlayback() {
+            if (!isPlaying) {
+                return;
+            }
+
+            // Verificar se chegou ao fim
+            if (currentSceneIndex >= currentProject.scenes.length) {
+                console.log('Fim da reprodução');
+                pauseVideo();
+                currentSceneIndex = 0;
+                showScene(0);
+                showStatus('Reprodução concluída!', 'success');
+                return;
+            }
+
+            console.log(`Reproduzindo cena ${currentSceneIndex + 1} de ${currentProject.scenes.length}`);
+            showScene(currentSceneIndex);
+
+            const scene = currentProject.scenes[currentSceneIndex];
+            const duration = scene.duration * 1000; // Converter para milissegundos
+
+            console.log(`Duração da cena: ${duration}ms`);
+            console.log(`Próxima cena em: ${duration}ms`);
+
+            // Agendar próxima cena
+            playbackTimer = setTimeout(() => {
+                if (isPlaying) { // Verificar se ainda está tocando
+                    currentSceneIndex++;
+                    console.log(`Avançando para cena ${currentSceneIndex + 1}`);
+                    startScenePlayback();
+                }
+            }, duration);
+        }
+
+        // Função para exibir legendas
+        function startSubtitles() {
+            const subtitlesOverlay = document.getElementById('subtitlesOverlay');
+            if (!subtitlesOverlay) return;
+
+            let currentSubtitleIndex = 0;
+            const subtitles = currentProject.subtitles.legendas;
+
+            subtitleTimer = setInterval(() => {
+                if (!audioElement) return;
+
+                const currentTime = audioElement.currentTime;
+
+                // Encontrar legenda atual
+                let activeSubtitle = null;
+                for (const subtitle of subtitles) {
+                    if (currentTime >= subtitle.inicio && currentTime <= subtitle.fim) {
+                        activeSubtitle = subtitle;
+                        break;
+                    }
+                }
+
+                // Exibir ou esconder legenda
+                if (activeSubtitle) {
+                    subtitlesOverlay.textContent = activeSubtitle.texto;
+                    subtitlesOverlay.classList.add('active');
+                } else {
+                    subtitlesOverlay.classList.remove('active');
+                }
+            }, 100); // Atualizar a cada 100ms
+        }
+
+        // Função principal para gerar vídeo
+        async function generateVideo() {
+            const prompt = document.getElementById('prompt').value.trim();
+            
+            if (!prompt) {
+                showStatus('Por favor, insira uma descrição do vídeo', 'warning');
+                return;
+            }
+
+            if (isGenerating) {
+                showStatus('Já estou gerando um vídeo...', 'warning');
+                return;
+            }
+
+            isGenerating = true;
+            showLoading(true);
+
+            try {
+                // ETAPA 1: Gerar Roteiro Segmentado
+                showStatus('Etapa 1/5: Criando roteiro educativo...', 'info');
+                const scriptResponse = await fetch('http://localhost:3000/api/generate-script', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                if (!scriptResponse.ok) {
+                    throw new Error('Erro ao gerar roteiro');
+                }
+
+                const { scriptData } = await scriptResponse.json();
+
+                // Mostra roteiro
+                const fullScript = scriptData.segmentos.map(seg => seg.texto).join(' ');
+                document.getElementById('scriptText').textContent = fullScript;
+                document.getElementById('wordCount').textContent = `${scriptData.palavras_totais} palavras (~30 segundos)`;
+                document.getElementById('scriptDisplay').style.display = 'block';
+
+                // ETAPA 2: Gerar Áudio da Narração
+                showStatus('Etapa 2/5: Gerando narração com Google Text-to-Speech...', 'info');
+                const voice = document.getElementById('voice').value;
+                const speechRate = parseFloat(document.getElementById('speechRate').value);
+
+                const audioResponse = await fetch('http://localhost:3000/api/generate-audio-with-timing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        segmentos: scriptData.segmentos,
+                        voice,
+                        speakingRate: speechRate
+                    })
+                });
+
+                if (!audioResponse.ok) {
+                    throw new Error('Erro ao gerar áudio');
+                }
+
+                const audioData = await audioResponse.json();
+
+                // ETAPA 3: Análise de Tempo e Preparação das Cenas
+                showStatus('Etapa 3/5: Analisando duração dos trechos...', 'info');
+                const scenes = audioData.segmentos.map((seg, index) => ({
+                    id: index,
+                    text: seg.texto,
+                    startTime: seg.inicio,
+                    endTime: seg.fim,
+                    duration: seg.duracao,
+                    keywords: scriptData.segmentos[index].palavras_chave,
+                    tipoVisual: scriptData.segmentos[index].tipo_visual
+                }));
+
+                // ETAPA 4: Buscar Imagens/Vídeos para Cada Trecho
+                showStatus('Etapa 4/5: Buscando imagens e vídeos...', 'info');
+                const mediaPromises = scenes.map(async (scene) => {
+                    const mediaResponse = await fetch('http://localhost:3000/api/search-media', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            keywords: scene.keywords,
+                            tipo: scene.tipoVisual === 'video' ? 'video' : 'gif',
+                            duracao: scene.duration,
+                            count: 1
+                        })
+                    });
+
+                    if (mediaResponse.ok) {
+                        const { media } = await mediaResponse.json();
+                        return media[0] || null;
+                    }
+                    return null;
+                });
+
+                const mediaResults = await Promise.all(mediaPromises);
+
+                // Se não encontrar mídia, usa placeholders
+                const images = scenes.map((scene, index) => {
+                    if (mediaResults[index]) {
+                        return {
+                            sceneId: scene.id,
+                            url: mediaResults[index].url,
+                            preview: mediaResults[index].preview,
+                            tipo: mediaResults[index].tipo,
+                            alt: scene.keywords.join(' ')
+                        };
+                    } else {
+                        return {
+                            sceneId: scene.id,
+                            url: `data:image/svg+xml;base64,${generatePlaceholderImage(scene.keywords, index)}`,
+                            tipo: 'placeholder',
+                            alt: scene.keywords.join(' ')
+                        };
+                    }
+                });
+
+                // ETAPA 5: Gerar Legendas
+                showStatus('Etapa 5/5: Criando legendas sincronizadas...', 'info');
+                const subtitleResponse = await fetch('http://localhost:3000/api/generate-subtitles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        segmentos: audioData.segmentos
+                    })
+                });
+
+                let subtitles = null;
+                if (subtitleResponse.ok) {
+                    const subtitleData = await subtitleResponse.json();
+                    subtitles = subtitleData;
+                }
+
+                // Criar timeline com tempos reais
+                const track = document.getElementById('timelineTrack');
+                track.innerHTML = '';
+
+                scenes.forEach((scene, index) => {
+                    const segment = document.createElement('div');
+                    segment.className = 'timeline-segment';
+                    segment.style.left = `${(scene.startTime / audioData.duracaoTotal) * 100}%`;
+                    segment.style.width = `${(scene.duration / audioData.duracaoTotal) * 100}%`;
+                    segment.textContent = `Cena ${index + 1}`;
+                    segment.onclick = () => showScene(index);
+                    
+                    track.appendChild(segment);
+                });
+
+                // Salvar projeto completo
+                currentProject = {
+                    prompt,
+                    script: fullScript,
+                    scenes,
+                    images,
+                    audio: {
+                        duration: audioData.duracaoTotal,
+                        url: audioData.audioCompleto.startsWith('data:') 
+                            ? audioData.audioCompleto 
+                            : `data:audio/mp3;base64,${audioData.audioCompleto}`,
+                        segments: audioData.segmentos
+                    },
+                    subtitles
+                };
+
+                // Habilitar controles
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('exportBtn').disabled = false;
+
+                // Mostrar primeira cena
+                showScene(0);
+
+                // Atualizar duração total
+                const minutes = Math.floor(audioData.duracaoTotal / 60);
+                const seconds = Math.floor(audioData.duracaoTotal % 60);
+                document.getElementById('duration').textContent = `0:00 / ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                showStatus('Vídeo gerado com sucesso!', 'success');
+
+            } catch (error) {
+                console.error('Erro:', error);
+                
+                // Se o servidor não estiver rodando, usa fallback
+                if (error.message.includes('fetch')) {
+                    showStatus('Servidor não encontrado. Usando modo demonstração...', 'warning');
+                    generateDemoVideo(prompt);
+                } else {
+                    showStatus('Erro ao gerar vídeo: ' + error.message, 'error');
+                }
+            } finally {
+                isGenerating = false;
+                showLoading(false);
+            }
+        }
+
+        // Função de fallback para demonstração
+        async function generateDemoVideo(prompt) {
+            // Simula o processo com dados de exemplo
+            const topic = extractTopic(prompt);
+            const script = `Bem-vindo ao nosso guia sobre ${topic}. Em 30 segundos, você aprenderá os conceitos essenciais. Vamos começar explorando os fundamentos. Depois, veremos aplicações práticas. Por fim, você estará pronto para aplicar este conhecimento!`;
+
+            document.getElementById('scriptText').textContent = script;
+            const wordCount = script.split(/\s+/).length;
+            document.getElementById('wordCount').textContent = `${wordCount} palavras (~${Math.round(wordCount / 2.5)} segundos)`;
+            document.getElementById('scriptDisplay').style.display = 'block';
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const sentences = script.match(/[^.!?]+[.!?]+/g) || [];
+            const scenes = sentences.map((sentence, index) => ({
+                id: index,
+                text: sentence.trim(),
+                startTime: index * 6,
+                endTime: (index + 1) * 6,
+                duration: 6,
+                keywords: extractKeywords(sentence)
+            }));
+
+            const images = scenes.map((scene, index) => ({
+                sceneId: scene.id,
+                url: `data:image/svg+xml;base64,${generatePlaceholderImage(scene.keywords, index)}`,
+                tipo: 'placeholder',
+                alt: scene.keywords.join(' ')
+            }));
+
+            const track = document.getElementById('timelineTrack');
+            track.innerHTML = '';
+
+            scenes.forEach((scene, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'timeline-segment';
+                segment.style.left = `${(scene.startTime / 30) * 100}%`;
+                segment.style.width = `${(scene.duration / 30) * 100}%`;
+                segment.textContent = `Cena ${index + 1}`;
+                segment.onclick = () => showScene(index);
+                
+                track.appendChild(segment);
+            });
+
+            currentProject = {
+                prompt,
+                script,
+                scenes,
+                images,
+                audio: { duration: 30, url: 'demo' }
+            };
+
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('exportBtn').disabled = false;
+            showScene(0);
+            showStatus('Modo demonstração: APIs não configuradas', 'warning');
+        }
+
+        // Função para exportar projeto
+        function exportProject() {
+            if (!currentProject) {
+                showStatus('Nenhum projeto para exportar', 'warning');
+                return;
+            }
+
+            // Iniciar exportação de vídeo diretamente
+            exportVideoMP4();
+        }
+
+        // Função para mostrar outras opções de exportação
+        function showExportOptions() {
+            // Criar menu de opções de export
+            const exportOptions = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                            background: #1a1a2e; padding: 2rem; border-radius: 12px; 
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000;">
+                    <h3 style="color: #e5e5e5; margin-bottom: 1.5rem;">Outras Opções de Exportação</h3>
+                    
+                    <button onclick="downloadProjectData()" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;">
+                        📄 Baixar Dados do Projeto (JSON)
+                    </button>
+                    
+                    <button onclick="downloadAudio()" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;">
+                        🎵 Baixar Áudio (MP3)
+                    </button>
+                    
+                    <button onclick="downloadSubtitles()" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;">
+                        📝 Baixar Legendas (VTT)
+                    </button>
+                    
+                    <button onclick="downloadMediaList()" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;">
+                        🖼️ Lista de Mídias (TXT)
+                    </button>
+                    
+                    <button onclick="closeExportMenu()" class="btn btn-primary" style="width: 100%;">
+                        Fechar
+                    </button>
+                </div>
+                <div id="exportOverlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                                               background: rgba(0,0,0,0.7); z-index: 999;"
+                     onclick="closeExportMenu()"></div>
+            `;
+
+            // Adicionar ao DOM
+            const exportDiv = document.createElement('div');
+            exportDiv.id = 'exportMenu';
+            exportDiv.innerHTML = exportOptions;
+            document.body.appendChild(exportDiv);
+        }
+
+        // Fechar menu de exportação
+        window.closeExportMenu = function() {
+            const menu = document.getElementById('exportMenu');
+            if (menu) menu.remove();
+        }
+
+        // Baixar dados do projeto
+        window.downloadProjectData = function() {
+            const dataStr = JSON.stringify(currentProject, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `projeto_video_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus('Projeto baixado com sucesso!', 'success');
+            closeExportMenu();
+        }
+
+        // Baixar áudio
+        window.downloadAudio = function() {
+            if (!currentProject.audio || !currentProject.audio.url || 
+                currentProject.audio.url === 'placeholder' || 
+                currentProject.audio.url === 'demo') {
+                showStatus('Áudio não disponível para download', 'warning');
+                return;
+            }
+
+            // Converter base64 para blob
+            const base64 = currentProject.audio.url.split(',')[1] || currentProject.audio.url;
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'audio/mp3' });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audio_narracao_${Date.now()}.mp3`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus('Áudio baixado com sucesso!', 'success');
+            closeExportMenu();
+        }
+
+        // Baixar legendas
+        window.downloadSubtitles = function() {
+            if (!currentProject.subtitles || !currentProject.subtitles.vtt) {
+                showStatus('Legendas não disponíveis', 'warning');
+                return;
+            }
+
+            const blob = new Blob([currentProject.subtitles.vtt], { type: 'text/vtt' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `legendas_${Date.now()}.vtt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus('Legendas baixadas com sucesso!', 'success');
+            closeExportMenu();
+        }
+
+        // Baixar lista de mídias
+        window.downloadMediaList = function() {
+            let mediaInfo = `Projeto de Vídeo - ${new Date().toLocaleString('pt-BR')}\n\n`;
+            mediaInfo += `Prompt: ${currentProject.prompt}\n\n`;
+            mediaInfo += `Roteiro:\n${currentProject.script}\n\n`;
+            mediaInfo += `Mídias Utilizadas:\n`;
+            
+            currentProject.images.forEach((img, index) => {
+                const scene = currentProject.scenes[index];
+                mediaInfo += `\nCena ${index + 1}:\n`;
+                mediaInfo += `Texto: ${scene.text}\n`;
+                mediaInfo += `Tipo: ${img.tipo}\n`;
+                mediaInfo += `URL: ${img.url}\n`;
+                mediaInfo += `Fonte: ${img.fonte || 'placeholder'}\n`;
+            });
+
+            const blob = new Blob([mediaInfo], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `info_projeto_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus('Informações do projeto baixadas!', 'success');
+            closeExportMenu();
+        }
+
+        // Função principal para exportar vídeo MP4
+        async function exportVideoMP4() {
+            if (!currentProject) {
+                showStatus('Nenhum projeto para exportar', 'warning');
+                return;
+            }
+
+            // Criar interface de progresso
+            const progressDiv = document.createElement('div');
+            progressDiv.innerHTML = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                            background: #1a1a2e; padding: 2rem; border-radius: 12px; 
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; min-width: 400px;">
+                    <h3 style="color: #e5e5e5; margin-bottom: 1.5rem;">Exportando Vídeo MP4</h3>
+                    
+                    <div style="background: #0f0f1f; height: 20px; border-radius: 10px; overflow: hidden; margin-bottom: 1rem;">
+                        <div id="exportProgress" style="background: linear-gradient(45deg, #667eea, #764ba2); 
+                                                      height: 100%; width: 0%; transition: width 0.3s;">
+                        </div>
+                    </div>
+                    
+                    <p id="exportStatus" style="color: #a5a5a5; text-align: center;">Preparando exportação...</p>
+                    
+                    <button onclick="showExportOptions()" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">
+                        Outras Opções de Exportação
+                    </button>
+                </div>
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                           background: rgba(0,0,0,0.7); z-index: 999;"></div>
+            `;
+            document.body.appendChild(progressDiv);
+
+            try {
+                // Criar canvas para renderização
+                const canvas = document.createElement('canvas');
+                canvas.width = 360;
+                canvas.height = 640;
+                const ctx = canvas.getContext('2d');
+
+                // Configurar MediaRecorder
+                const stream = canvas.captureStream(30); // 30 FPS
+                
+                // Adicionar áudio ao stream se disponível
+                if (currentProject.audio.url && currentProject.audio.url !== 'placeholder' && currentProject.audio.url !== 'demo') {
+                    try {
+                        const audioEl = new Audio(currentProject.audio.url);
+                        await audioEl.play();
+                        audioEl.pause();
+                        audioEl.currentTime = 0;
+                        
+                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const source = audioContext.createMediaElementSource(audioEl);
+                        const destination = audioContext.createMediaStreamDestination();
+                        source.connect(destination);
+                        
+                        // Adicionar track de áudio ao stream
+                        destination.stream.getAudioTracks().forEach(track => {
+                            stream.addTrack(track);
+                        });
+                    } catch (err) {
+                        console.log('Não foi possível adicionar áudio ao vídeo:', err);
+                    }
+                }
+
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: 2500000 // 2.5 Mbps
+                });
+
+                const chunks = [];
+                mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+                
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    
+                    // Baixar o vídeo
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    a.download = `video_educativo_${timestamp}.webm`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    progressDiv.remove();
+                    
+                    // Mostrar instruções para conversão
+                    showStatus('Vídeo WebM exportado! Para converter para MP4, use: ffmpeg -i video.webm video.mp4', 'success');
+                    
+                    // Oferecer conversão online
+                    setTimeout(() => {
+                        if (confirm('Deseja converter para MP4? Será redirecionado para um conversor online gratuito.')) {
+                            window.open('https://cloudconvert.com/webm-to-mp4', '_blank');
+                        }
+                    }, 1000);
+                };
+
+                // Iniciar gravação
+                mediaRecorder.start();
+
+                // Renderizar cada cena
+                for (let i = 0; i < currentProject.scenes.length; i++) {
+                    const scene = currentProject.scenes[i];
+                    const image = currentProject.images[i];
+                    
+                    // Atualizar progresso
+                    const progress = ((i + 1) / currentProject.scenes.length) * 100;
+                    document.getElementById('exportProgress').style.width = progress + '%';
+                    document.getElementById('exportStatus').textContent = `Processando cena ${i + 1} de ${currentProject.scenes.length}...`;
+
+                    // Carregar e desenhar imagem/vídeo
+                    await renderSceneToCanvas(ctx, image, scene);
+
+                    // Aguardar duração da cena
+                    await new Promise(resolve => setTimeout(resolve, scene.duration * 1000));
+                }
+
+                // Finalizar gravação
+                mediaRecorder.stop();
+
+            } catch (error) {
+                console.error('Erro ao exportar vídeo:', error);
+                progressDiv.remove();
+                showStatus('Erro ao exportar vídeo: ' + error.message, 'error');
+            }
+        }
+
+        // Função auxiliar para renderizar cena no canvas
+        async function renderSceneToCanvas(ctx, image, scene) {
+            return new Promise((resolve) => {
+                // Limpar canvas
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, 360, 640);
+
+                if (image.tipo === 'placeholder' || image.url.startsWith('data:image/svg')) {
+                    // Desenhar placeholder
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, 360, 640);
+                        drawSubtitles(ctx, scene.text);
+                        resolve();
+                    };
+                    img.src = image.url;
+                } else {
+                    // Carregar imagem/vídeo real
+                    if (image.tipo === 'video' || image.tipo === 'gif') {
+                        const video = document.createElement('video');
+                        video.src = image.url;
+                        video.muted = true;
+                        video.loop = true;
+                        
+                        video.onloadeddata = () => {
+                            video.play().then(() => {
+                                // Desenhar frame do vídeo
+                                const drawFrame = () => {
+                                    ctx.drawImage(video, 0, 0, 360, 640);
+                                    drawSubtitles(ctx, scene.text);
+                                };
+                                drawFrame();
+                                // Continuar desenhando frames durante a duração da cena
+                                const interval = setInterval(drawFrame, 1000 / 30); // 30 FPS
+                                setTimeout(() => {
+                                    clearInterval(interval);
+                                    video.pause();
+                                    resolve();
+                                }, scene.duration * 1000);
+                            });
+                        };
+                        video.load();
+                    } else {
+                        // Imagem estática
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                            ctx.drawImage(img, 0, 0, 360, 640);
+                            drawSubtitles(ctx, scene.text);
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            // Se falhar, usar placeholder
+                            ctx.fillStyle = '#667eea';
+                            ctx.fillRect(0, 0, 360, 640);
+                            drawSubtitles(ctx, scene.text);
+                            resolve();
+                        };
+                        img.src = image.url;
+                    }
+                }
+            });
+        }
+
+        // Função para desenhar legendas no canvas
+        function drawSubtitles(ctx, text) {
+            // Configurar estilo das legendas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(0, 540, 360, 100);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Quebrar texto em linhas se necessário
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+            
+            words.forEach(word => {
+                const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > 320 && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            });
+            if (currentLine) lines.push(currentLine);
+            
+            // Desenhar linhas
+            lines.forEach((line, index) => {
+                ctx.fillText(line, 180, 590 + (index * 25) - ((lines.length - 1) * 12.5));
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botão gerar
+            document.getElementById('generateBtn').addEventListener('click', generateVideo);
+            
+            // Botão limpar
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+            
+            // Slider de velocidade
+            document.getElementById('speechRate').addEventListener('input', function(e) {
+                document.getElementById('speechRateValue').textContent = `${e.target.value}x`;
+            });
+            
+            // Botão play
+            document.getElementById('playBtn').addEventListener('click', togglePlayback);
+            
+            // Botão exportar
+            document.getElementById('exportBtn').addEventListener('click', exportProject);
+        });
+    </script>
+</body>
+</html>

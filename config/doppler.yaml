@@ -1,0 +1,25 @@
+# Configuração do Doppler para o Criador de Vídeos IA
+
+setup:
+  project: video-creator-ai
+  config: dev
+
+# Para configurar:
+# 1. Instale o Doppler CLI: curl -Ls https://cli.doppler.com/install.sh | sh
+# 2. Faça login: doppler login
+# 3. Configure o projeto: doppler setup
+# 4. Adicione as secrets:
+
+# Secrets necessárias:
+# - OPENAI_API_KEY: Sua chave da OpenAI (ou AI_API_KEY para outras APIs)
+# - GOOGLE_APPLICATION_CREDENTIALS: Caminho para o arquivo JSON de credenciais do Google Cloud
+# - GOOGLE_TTS_API_KEY: Chave da API Google Text-to-Speech (se usar chave de API ao invés de credenciais)
+# - UNSPLASH_ACCESS_KEY: Chave de acesso do Unsplash para buscar imagens
+
+# Comandos úteis:
+# doppler secrets set OPENAI_API_KEY "sk-..."
+# doppler secrets set UNSPLASH_ACCESS_KEY "..."
+# doppler secrets download --no-file --format env > .env
+
+# Para rodar o servidor:
+# doppler run -- npm start

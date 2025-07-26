@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Vídeos IA - Linguagem Natural para Vídeos Educativos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f0f0f;
+            color: #e5e5e5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(to right, #1a1a2e, #16213e);
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .input-panel {
+            flex: 1;
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .prompt-area {
+            width: 100%;
+            min-height: 150px;
+            background: #0f0f1f;
+            border: 2px solid #2d3561;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #e5e5e5;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .prompt-area:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #2d3561;
+            color: #e5e5e5;
+        }
+
+        .btn-secondary:hover {
+            background: #3d4671;
+        }
+
+        .preview-panel {
+            flex: 1;
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .video-preview {
+            background: #0f0f1f;
+            border-radius: 8px;
+            aspect-ratio: 9/16;
+            max-width: 360px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-content {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .preview-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .timeline {
+            margin-top: 2rem;
+            background: #0f0f1f;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-track {
+            background: #2d3561;
+            height: 60px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-segment {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            font-size: 0.875rem;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .timeline-segment:hover {
+            opacity: 0.8;
+        }
+
+        .settings-panel {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #0f0f1f;
+            border-radius: 8px;
+        }
+
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #a5a5a5;
+            font-size: 0.875rem;
+        }
+
+        .setting-group select,
+        .setting-group input[type="range"] {
+            width: 100%;
+            background: #2d3561;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem;
+            color: #e5e5e5;
+        }
+
+        .range-value {
+            text-align: right;
+            color: #667eea;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .status-message {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: #2d3561;
+            color: white;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .status-message.success {
+            background: #10b981;
+        }
+
+        .status-message.error {
+            background: #ef4444;
+        }
+
+        .status-message.warning {
+            background: #f59e0b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2d3561;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading .spinner {
+            display: block;
+        }
+
+        .script-display {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #0f0f1f;
+            border-radius: 8px;
+            border: 1px solid #2d3561;
+        }
+
+        .script-display h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .script-text {
+            color: #e5e5e5;
+            line-height: 1.6;
+        }
+
+        .word-count {
+            color: #a5a5a5;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Criador de Vídeos IA</h1>
+    </header>
+
+    <main class="main-container">
+        <!-- Painel de Entrada -->
+        <div class="input-panel">
+            <h2 style="margin-bottom: 1.5rem; color: #e5e5e5;">Crie Seu Vídeo</h2>
+            
+            <div>
+                <label for="prompt" style="display: block; margin-bottom: 0.5rem; color: #a5a5a5;">
+                    Descreva seu vídeo educativo (ex: "Crie um vídeo sobre os benefícios da meditação")
+                </label>
+                <textarea 
+                    id="prompt" 
+                    class="prompt-area" 
+                    placeholder="Exemplo: Crie um vídeo de 30 segundos explicando como funciona a fotossíntese para alunos do ensino fundamental. Use linguagem simples e imagens coloridas de plantas e luz solar."
+                ></textarea>
+            </div>
+
+            <div class="controls">
+                <button id="generateBtn" class="btn btn-primary">
+                    Gerar Vídeo
+                </button>
+                <button id="clearBtn" class="btn btn-secondary">
+                    Limpar
+                </button>
+                <div id="spinner" class="spinner"></div>
+            </div>
+
+            <div class="settings-panel">
+                <h3 style="margin-bottom: 1rem; color: #e5e5e5;">Configurações</h3>
+                
+                <div class="setting-group">
+                    <label for="voice">Seleção de Voz</label>
+                    <select id="voice">
+                        <option value="pt-BR-Neural2-A">Português Brasil - Feminina</option>
+                        <option value="pt-BR-Neural2-B">Português Brasil - Masculina</option>
+                        <option value="pt-BR-Neural2-C">Português Brasil - Feminina (jovem)</option>
+                        <option value="pt-PT-Neural2-A">Português Portugal - Feminina</option>
+                        <option value="pt-PT-Neural2-B">Português Portugal - Masculina</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label for="speechRate">Velocidade da Fala</label>
+                    <input type="range" id="speechRate" min="0.75" max="1.25" step="0.05" value="1.0">
+                    <div class="range-value" id="speechRateValue">1.0x</div>
+                </div>
+
+                <div class="setting-group">
+                    <label for="imageStyle">Estilo de Imagem</label>
+                    <select id="imageStyle">
+                        <option value="educational">Educacional</option>
+                        <option value="animated">Animado</option>
+                        <option value="realistic">Realista</option>
+                        <option value="minimalist">Minimalista</option>
+                        <option value="colorful">Colorido</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="scriptDisplay" class="script-display" style="display: none;">
+                <h3>Roteiro Gerado</h3>
+                <div class="script-text" id="scriptText"></div>
+                <div class="word-count" id="wordCount"></div>
+            </div>
+        </div>
+
+        <!-- Painel de Visualização -->
+        <div class="preview-panel">
+            <h2 style="margin-bottom: 1.5rem; color: #e5e5e5;">Visualização</h2>
+            
+            <div class="video-preview" id="videoPreview">
+                <div class="preview-content">
+                    <p style="color: #a5a5a5;">A visualização do seu vídeo aparecerá aqui</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-header">
+                    <h3 style="color: #e5e5e5;">Linha do Tempo</h3>
+                    <span id="duration" style="color: #a5a5a5;">0:00 / 0:30</span>
+                </div>
+                <div class="timeline-track" id="timelineTrack">
+                    <!-- Segmentos da linha do tempo serão adicionados aqui -->
+                </div>
+            </div>
+
+            <div class="controls" style="margin-top: 2rem; justify-content: center;">
+                <button id="playBtn" class="btn btn-secondary" disabled>
+                    ▶️ Reproduzir Prévia
+                </button>
+                <button id="exportBtn" class="btn btn-primary" disabled>
+                    Exportar Vídeo
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <script>
+        // Variáveis globais
+        let currentProject = null;
+        let isGenerating = false;
+
+        // Função para mostrar status
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            statusEl.style.display = 'block';
+
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // Função para mostrar/esconder spinner
+        function showLoading(show) {
+            const generateBtn = document.getElementById('generateBtn');
+            const spinner = document.getElementById('spinner');
+            
+            generateBtn.style.display = show ? 'none' : 'block';
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        // Função para limpar tudo
+        function clearAll() {
+            document.getElementById('prompt').value = '';
+            document.getElementById('scriptDisplay').style.display = 'none';
+            document.getElementById('videoPreview').innerHTML = '<div class="preview-content"><p style="color: #a5a5a5;">A visualização do seu vídeo aparecerá aqui</p></div>';
+            document.getElementById('timelineTrack').innerHTML = '';
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('exportBtn').disabled = true;
+            currentProject = null;
+        }
+
+        // Função para extrair tópico
+        function extractTopic(prompt) {
+            const keywords = ['sobre', 'explicando', 'a respeito', 'acerca'];
+            for (const keyword of keywords) {
+                const index = prompt.toLowerCase().indexOf(keyword);
+                if (index !== -1) {
+                    return prompt.substring(index + keyword.length).trim().split(' ').slice(0, 3).join(' ');
+                }
+            }
+            return 'este tópico';
+        }
+
+        // Função para extrair palavras-chave
+        function extractKeywords(text) {
+            const commonWords = ['o', 'a', 'os', 'as', 'um', 'uma', 'e', 'ou', 'mas', 'em', 'de', 'para', 'com', 'por'];
+            return text.toLowerCase()
+                .split(/\W+/)
+                .filter(word => word.length > 3 && !commonWords.includes(word))
+                .slice(0, 3);
+        }
+
+        // Função para gerar imagem placeholder
+        function generatePlaceholderImage(keywords, index) {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
+            const color = colors[index % colors.length];
+            
+            const svg = `
+                <svg width="360" height="640" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="360" height="640" fill="${color}"/>
+                    <text x="50%" y="50%" text-anchor="middle" fill="white" font-size="24" font-family="Arial">
+                        ${keywords[0] || 'Cena ' + (index + 1)}
+                    </text>
+                </svg>
+            `;
+            
+            return btoa(svg);
+        }
+
+        // Função para mostrar cena
+        function showScene(index) {
+            if (!currentProject) return;
+
+            const scene = currentProject.scenes[index];
+            const image = currentProject.images[index];
+
+            document.getElementById('videoPreview').innerHTML = `
+                <img src="${image.url}" alt="${image.alt}" class="preview-image">
+                <div class="preview-text">${scene.text}</div>
+            `;
+        }
+
+        // Função principal para gerar vídeo
+        async function generateVideo() {
+            const prompt = document.getElementById('prompt').value.trim();
+            
+            if (!prompt) {
+                showStatus('Por favor, insira uma descrição do vídeo', 'warning');
+                return;
+            }
+
+            if (isGenerating) {
+                showStatus('Já estou gerando um vídeo...', 'warning');
+                return;
+            }
+
+            isGenerating = true;
+            showLoading(true);
+            showStatus('Gerando seu vídeo...', 'info');
+
+            try {
+                // Simula delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Gera roteiro
+                const topic = extractTopic(prompt);
+                const script = `Bem-vindo ao nosso guia rápido sobre ${topic}. 
+                Em apenas 30 segundos, você descobrirá os conceitos principais que tornam este tema fascinante. 
+                Primeiro, vamos entender o básico. Este processo envolve várias etapas importantes que trabalham juntas para criar um resultado incrível.
+                Lembre-se desses pontos principais ao explorar mais. 
+                Obrigado por aprender conosco hoje!`;
+
+                // Mostra roteiro
+                document.getElementById('scriptText').textContent = script;
+                const wordCount = script.split(/\s+/).length;
+                document.getElementById('wordCount').textContent = `${wordCount} palavras (~${Math.round(wordCount / 2.5)} segundos)`;
+                document.getElementById('scriptDisplay').style.display = 'block';
+
+                // Simula mais delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Gera cenas
+                const sentences = script.match(/[^.!?]+[.!?]+/g) || [];
+                const scenes = sentences.map((sentence, index) => ({
+                    id: index,
+                    text: sentence.trim(),
+                    duration: 30 / sentences.length,
+                    keywords: extractKeywords(sentence)
+                }));
+
+                // Gera imagens
+                const images = scenes.map((scene, index) => ({
+                    sceneId: scene.id,
+                    url: `data:image/svg+xml;base64,${generatePlaceholderImage(scene.keywords, index)}`,
+                    alt: scene.keywords.join(' ')
+                }));
+
+                // Cria timeline
+                const track = document.getElementById('timelineTrack');
+                track.innerHTML = '';
+
+                let currentTime = 0;
+                scenes.forEach((scene, index) => {
+                    const segment = document.createElement('div');
+                    segment.className = 'timeline-segment';
+                    segment.style.left = `${(currentTime / 30) * 100}%`;
+                    segment.style.width = `${(scene.duration / 30) * 100}%`;
+                    segment.textContent = `Cena ${index + 1}`;
+                    segment.onclick = () => showScene(index);
+                    
+                    track.appendChild(segment);
+                    currentTime += scene.duration;
+                });
+
+                // Salva projeto
+                currentProject = {
+                    prompt,
+                    script,
+                    scenes,
+                    images,
+                    audio: { duration: 30, url: 'placeholder' }
+                };
+
+                // Habilita controles
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('exportBtn').disabled = false;
+
+                // Mostra primeira cena
+                showScene(0);
+
+                showStatus('Vídeo gerado com sucesso!', 'success');
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showStatus('Erro ao gerar vídeo: ' + error.message, 'error');
+            } finally {
+                isGenerating = false;
+                showLoading(false);
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botão gerar
+            document.getElementById('generateBtn').addEventListener('click', generateVideo);
+            
+            // Botão limpar
+            document.getElementById('clearBtn').addEventListener('click', clearAll);
+            
+            // Slider de velocidade
+            document.getElementById('speechRate').addEventListener('input', function(e) {
+                document.getElementById('speechRateValue').textContent = `${e.target.value}x`;
+            });
+            
+            // Botão play
+            document.getElementById('playBtn').addEventListener('click', function() {
+                showStatus('Reprodução em desenvolvimento...', 'info');
+            });
+            
+            // Botão exportar
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                showStatus('Exportação em desenvolvimento...', 'info');
+            });
+        });
+    </script>
+</body>
+</html>

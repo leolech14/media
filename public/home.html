@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social AI Pro - Criador de Vídeos com IA</title>
+    <title>Social AI Pro - AI Video Creator Platform</title>
+    <meta name="description" content="Transform text into engaging 30-second educational videos with AI-powered scripts, professional narration, and intelligent media selection.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' text-anchor='middle' font-size='80'>🎬</text></svg>">
     <style>
         * {
             margin: 0;
@@ -122,41 +124,41 @@
 <body>
     <div class="container">
         <h1>🎬 Social AI Pro</h1>
-        <p class="subtitle">Criador de Vídeos Educativos com Inteligência Artificial</p>
+        <p class="subtitle">Transform Text into Engaging Educational Videos with AI</p>
         
         <div class="status" id="status">
-            <h2 style="margin-bottom: 1rem;">Status da API</h2>
+            <h2 style="margin-bottom: 1rem;">API Status</h2>
             <div class="status-item">
-                <span>Sistema</span>
-                <span id="system-status">Verificando...<span class="status-indicator"></span></span>
+                <span>System</span>
+                <span id="system-status">Checking...<span class="status-indicator"></span></span>
             </div>
             <div class="status-item">
                 <span>OpenAI</span>
-                <span id="openai-status">Verificando...</span>
+                <span id="openai-status">Checking...</span>
             </div>
             <div class="status-item">
                 <span>Google TTS</span>
-                <span id="google-status">Verificando...</span>
+                <span id="google-status">Checking...</span>
             </div>
             <div class="status-item">
-                <span>APIs de Mídia</span>
-                <span id="media-status">Verificando...</span>
+                <span>Media APIs</span>
+                <span id="media-status">Checking...</span>
             </div>
         </div>
         
         <div class="links">
             <a href="/app" class="link-button">🚀 Launch App</a>
-            <a href="/api-docs" class="link-button">📚 Documentação da API</a>
+            <a href="/api-docs" class="link-button">📚 API Documentation</a>
             <a href="/api/health" class="link-button">💚 Health Check</a>
             <a href="https://github.com/leolech14/media" class="link-button">💻 GitHub</a>
         </div>
         
         <div class="api-section">
-            <h3 style="margin-bottom: 1rem;">Principais Endpoints</h3>
-            <div class="api-endpoint">POST /api/generate-script</div>
-            <div class="api-endpoint">POST /api/generate-audio-with-timing</div>
-            <div class="api-endpoint">GET /api/search-media</div>
-            <div class="api-endpoint">POST /api/generate-subtitles</div>
+            <h3 style="margin-bottom: 1rem;">Core Endpoints</h3>
+            <div class="api-endpoint">POST /api/generate-script - AI Script Generation</div>
+            <div class="api-endpoint">POST /api/generate-audio-with-timing - Text-to-Speech</div>
+            <div class="api-endpoint">GET /api/search-media - Media Discovery</div>
+            <div class="api-endpoint">POST /api/generate-subtitles - Subtitle Creation</div>
         </div>
     </div>
     
@@ -169,16 +171,16 @@
                 
                 if (data.status === 'healthy') {
                     document.getElementById('system-status').innerHTML = 'Online <span class="status-indicator"></span>';
-                    document.getElementById('openai-status').innerHTML = data.apis.openai ? 'Conectado <span class="status-indicator"></span>' : 'Desconectado';
-                    document.getElementById('google-status').innerHTML = data.apis.google ? 'Conectado <span class="status-indicator"></span>' : 'Desconectado';
+                    document.getElementById('openai-status').innerHTML = data.apis.openai ? 'Connected <span class="status-indicator"></span>' : 'Disconnected';
+                    document.getElementById('google-status').innerHTML = data.apis.google ? 'Connected <span class="status-indicator"></span>' : 'Disconnected';
                     
                     const mediaAPIs = [data.apis.pexels, data.apis.giphy, data.apis.unsplash].filter(Boolean).length;
-                    document.getElementById('media-status').innerHTML = `${mediaAPIs}/3 Conectadas <span class="status-indicator"></span>`;
+                    document.getElementById('media-status').innerHTML = `${mediaAPIs}/3 Connected <span class="status-indicator"></span>`;
                 } else {
                     document.getElementById('system-status').innerHTML = 'Offline';
                 }
             } catch (error) {
-                document.getElementById('system-status').innerHTML = 'Erro ao conectar';
+                document.getElementById('system-status').innerHTML = 'Connection Error';
                 console.error('Status check failed:', error);
             }
         }

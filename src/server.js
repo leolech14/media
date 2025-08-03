@@ -84,6 +84,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/home.html'));
 });
 
+// App page route
+app.get('/app', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/app.html'));
+});
+
 // Configurações das APIs
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || 'AIzaSyCGgu4SF6RjAXB8WCSNy8UGTBsgHx7d4Kw';

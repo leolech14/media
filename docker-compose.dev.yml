@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: video-creator-ai-dev
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      # Use Doppler for secrets in development
+      - DOPPLER_TOKEN=${DOPPLER_TOKEN}
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - ./generated-videos:/app/generated-videos
+      - /app/node_modules
+    networks:
+      - app-network
+    command: npm run dev:doppler
+
+  redis:
+    image: redis:7-alpine
+    container_name: video-creator-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

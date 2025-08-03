@@ -4,11 +4,16 @@
   "description": "Criador de vídeos educativos com IA em português",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "start:doppler": "doppler run -- node server.js",
-    "dev:doppler": "doppler run -- nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "build": "echo 'No build step required for API'",
+    "dev": "nodemon src/server.js",
+    "start:doppler": "doppler run -- node src/server.js",
+    "dev:doppler": "doppler run -- nodemon src/server.js",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest tests/middleware",
+    "test:integration": "jest tests/integration"
   },
   "keywords": [
     "video",
@@ -22,13 +27,23 @@
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.0.0",
     "axios": "^1.6.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "edge-tts": "^1.0.1",
     "express": "^4.18.2",
-    "openai": "^3.3.0"
+    "express-rate-limit": "^8.0.1",
+    "express-validator": "^7.2.1",
+    "openai": "^4.52.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "nodemon": "^3.0.1",
+    "supertest": "^7.1.4"
   }
 }

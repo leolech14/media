@@ -44,3 +44,4 @@ exports/
 
 # Archive (optional - remove if you want to track)
 # archive/
+.vercel

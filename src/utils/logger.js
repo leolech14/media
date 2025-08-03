@@ -29,8 +29,8 @@ const transports = [
     })
 ];
 
-// Add file transports only in production
-if (process.env.NODE_ENV === 'production') {
+// Add file transports only in production and not in Vercel
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
     transports.push(
         // Daily rotate file for all logs
         new DailyRotateFile({

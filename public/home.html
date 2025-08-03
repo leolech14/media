@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social AI Pro - Criador de Vídeos com IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+        
+        .status {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+        }
+        
+        .links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .link-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .link-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .api-section {
+            margin-top: 3rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 2rem;
+        }
+        
+        .api-endpoint {
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Social AI Pro</h1>
+        <p class="subtitle">Criador de Vídeos Educativos com Inteligência Artificial</p>
+        
+        <div class="status" id="status">
+            <h2 style="margin-bottom: 1rem;">Status da API</h2>
+            <div class="status-item">
+                <span>Sistema</span>
+                <span id="system-status">Verificando...<span class="status-indicator"></span></span>
+            </div>
+            <div class="status-item">
+                <span>OpenAI</span>
+                <span id="openai-status">Verificando...</span>
+            </div>
+            <div class="status-item">
+                <span>Google TTS</span>
+                <span id="google-status">Verificando...</span>
+            </div>
+            <div class="status-item">
+                <span>APIs de Mídia</span>
+                <span id="media-status">Verificando...</span>
+            </div>
+        </div>
+        
+        <div class="links">
+            <a href="/api-docs" class="link-button">📚 Documentação da API</a>
+            <a href="/api/health" class="link-button">💚 Health Check</a>
+            <a href="https://github.com/leolech14/media" class="link-button">💻 GitHub</a>
+        </div>
+        
+        <div class="api-section">
+            <h3 style="margin-bottom: 1rem;">Principais Endpoints</h3>
+            <div class="api-endpoint">POST /api/generate-script</div>
+            <div class="api-endpoint">POST /api/generate-audio-with-timing</div>
+            <div class="api-endpoint">GET /api/search-media</div>
+            <div class="api-endpoint">POST /api/generate-subtitles</div>
+        </div>
+    </div>
+    
+    <script>
+        // Check API status
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('system-status').innerHTML = 'Online <span class="status-indicator"></span>';
+                    document.getElementById('openai-status').innerHTML = data.apis.openai ? 'Conectado <span class="status-indicator"></span>' : 'Desconectado';
+                    document.getElementById('google-status').innerHTML = data.apis.google ? 'Conectado <span class="status-indicator"></span>' : 'Desconectado';
+                    
+                    const mediaAPIs = [data.apis.pexels, data.apis.giphy, data.apis.unsplash].filter(Boolean).length;
+                    document.getElementById('media-status').innerHTML = `${mediaAPIs}/3 Conectadas <span class="status-indicator"></span>`;
+                } else {
+                    document.getElementById('system-status').innerHTML = 'Offline';
+                }
+            } catch (error) {
+                document.getElementById('system-status').innerHTML = 'Erro ao conectar';
+                console.error('Status check failed:', error);
+            }
+        }
+        
+        // Check status on load
+        checkStatus();
+        
+        // Refresh status every 30 seconds
+        setInterval(checkStatus, 30000);
+    </script>
+</body>
+</html>

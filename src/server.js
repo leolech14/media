@@ -63,7 +63,7 @@ app.use(compression({
 }));
 
 app.use(express.json({ limit: '50mb' }));
-app.use(express.static('.'));
+app.use(express.static('public'));
 
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -78,6 +78,11 @@ app.use(metricsCollector);
 
 // Rate limiting middleware para todas as rotas da API
 app.use('/api/', generalLimiter);
+
+// Home page route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/home.html'));
+});
 
 // Configurações das APIs
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;

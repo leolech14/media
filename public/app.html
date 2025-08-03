@@ -1117,6 +1117,14 @@
             checkAPIStatus();
             setupEventListeners();
             setInterval(checkAPIStatus, 30000); // Check every 30 seconds
+            
+            // Auto-populate prompt from URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const prompt = urlParams.get('prompt');
+            if (prompt) {
+                elements.prompt.value = decodeURIComponent(prompt);
+                elements.prompt.focus();
+            }
         });
 
         // Event Listeners

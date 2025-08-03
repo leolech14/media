@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social AI Pro</title>
+    <meta name="description" content="Transform text into engaging educational videos with AI">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' text-anchor='middle' font-size='80'>🎬</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .bg-animation::before,
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .bg-animation::before {
+            width: 600px;
+            height: 600px;
+            top: -300px;
+            left: -300px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation::after {
+            width: 800px;
+            height: 800px;
+            bottom: -400px;
+            right: -400px;
+            animation-delay: 10s;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.3) 0%, transparent 70%);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(100px, -50px) scale(1.1);
+            }
+            50% {
+                transform: translate(-50px, 100px) scale(0.9);
+            }
+            75% {
+                transform: translate(50px, 50px) scale(1.05);
+            }
+        }
+
+        /* Additional floating orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.2) 0%, transparent 70%);
+            animation: orbit 30s infinite linear;
+        }
+
+        .orb1 {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: 10%;
+            animation-duration: 25s;
+        }
+
+        .orb2 {
+            width: 200px;
+            height: 200px;
+            bottom: 20%;
+            right: 20%;
+            animation-duration: 35s;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.2) 0%, transparent 70%);
+        }
+
+        .orb3 {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 40s;
+            background: radial-gradient(circle, rgba(243, 147, 251, 0.1) 0%, transparent 70%);
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg) translateX(150px) rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg) translateX(150px) rotate(-360deg);
+            }
+        }
+
+        /* Main content */
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #e5e5e5;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box::placeholder {
+            color: rgba(229, 229, 229, 0.5);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(30, 30, 30, 0.9);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .add-tabs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(229, 229, 229, 0.5);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .add-tabs:hover {
+            color: rgba(229, 229, 229, 0.8);
+        }
+
+        .plus-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Quick actions */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e5e5e5;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(40, 40, 40, 0.9);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Status indicator */
+        .status {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: rgba(229, 229, 229, 0.7);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(74, 222, 128, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .status {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                justify-content: center;
+            }
+        }
+
+        /* Focus trap for accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-animation">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <!-- Main content -->
+    <main class="container">
+        <div class="logo" role="img" aria-label="Social AI Pro logo">
+            🎬
+        </div>
+
+        <div class="search-container">
+            <form action="/app" method="get" onsubmit="handleSearch(event)">
+                <label for="search" class="sr-only">Search or enter prompt</label>
+                <input 
+                    type="text" 
+                    id="search" 
+                    class="search-box" 
+                    placeholder="Create a video about..."
+                    autocomplete="off"
+                    autofocus
+                >
+            </form>
+        </div>
+
+        <div class="add-tabs">
+            <span class="plus-icon">+</span>
+            <span>Press Enter to create video</span>
+        </div>
+
+        <nav class="actions" role="navigation" aria-label="Quick actions">
+            <a href="/app" class="action-btn">
+                <span>✨</span>
+                <span>New Video</span>
+            </a>
+            <a href="#" onclick="showSkills(); return false;" class="action-btn">
+                <span>🎯</span>
+                <span>Browse Skills</span>
+            </a>
+        </nav>
+    </main>
+
+    <!-- Status indicator -->
+    <div class="status" id="status">
+        <span class="status-dot"></span>
+        <span id="statusText">All systems online</span>
+    </div>
+
+    <script>
+        // Handle search submission
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search').value.trim();
+            if (query) {
+                // Redirect to app with prompt
+                window.location.href = `/app?prompt=${encodeURIComponent(query)}`;
+            }
+        }
+
+        // Show skills modal
+        function showSkills() {
+            const skills = [
+                'Educational videos for any topic',
+                'Professional narration in multiple languages',
+                'Automatic subtitle generation',
+                'Smart media selection from multiple sources',
+                'Export in various formats'
+            ];
+            
+            alert('Social AI Pro can:\n\n' + skills.map(s => '• ' + s).join('\n'));
+        }
+
+        // Check API status
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    const connectedAPIs = Object.values(data.apis).filter(Boolean).length;
+                    document.getElementById('statusText').textContent = `${connectedAPIs}/5 APIs connected`;
+                } else {
+                    document.getElementById('statusText').textContent = 'Limited connectivity';
+                    document.querySelector('.status-dot').style.background = '#f59e0b';
+                }
+            } catch (error) {
+                document.getElementById('statusText').textContent = 'Offline mode';
+                document.querySelector('.status-dot').style.background = '#ef4444';
+            }
+        }
+
+        // Initialize
+        checkStatus();
+        setInterval(checkStatus, 30000);
+
+        // Auto-populate from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const prompt = urlParams.get('prompt');
+        if (prompt) {
+            document.getElementById('search').value = prompt;
+        }
+    </script>
+</body>
+</html>
